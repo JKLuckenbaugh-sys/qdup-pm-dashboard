@@ -1,0 +1,73 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && getUserData().role == 'admin';
+    }
+
+    function isStaff() {
+      return isSignedIn() && (getUserData().role == 'staff' || getUserData().role == 'admin');
+    }
+
+    function isClientForProject(clientId) {
+      return isSignedIn() && getUserData().role == 'client' && getUserData().clientId == clientId;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow create: if isAdmin();
+      allow update: if isAdmin() || request.auth.uid == userId;
+      allow delete: if isAdmin();
+    }
+
+    // Clients
+    match /clients/{clientId} {
+      allow read: if isStaff() || isClientForProject(clientId);
+      allow write: if isAdmin();
+
+      // Projects
+      match /projects/{projectId} {
+        allow read: if isStaff() || isClientForProject(clientId);
+        allow write: if isAdmin();
+
+        // Groups
+        match /groups/{groupId} {
+          allow read: if isStaff() || isClientForProject(clientId);
+          allow write: if isStaff();
+
+          // Items
+          match /items/{itemId} {
+            allow read: if isStaff() || isClientForProject(clientId);
+            allow create: if isStaff();
+            allow update: if isStaff();
+            allow delete: if isAdmin();
+
+            // Subitems
+            match /subitems/{subitemId} {
+              allow read: if isStaff() || isClientForProject(clientId);
+              allow write: if isStaff();
+            }
+          }
+        }
+      }
+    }
+
+    // Comments (flat collection for easier querying)
+    match /comments/{commentId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && (request.auth.uid == resource.data.authorId || isAdmin());
+    }
+  }
+}
