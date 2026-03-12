@@ -22,10 +22,8 @@ export function AuthProvider({ children }) {
         const snap = await getDoc(doc(db, 'users', firebaseUser.uid))
         if (snap.exists()) {
           const data = snap.data()
-          // Always prefer Google displayName if stored name is missing
           const name = data.name || firebaseUser.displayName || firebaseUser.email
           if (!data.name && firebaseUser.displayName) {
-            // Backfill the name into Firestore so it's set going forward
             await setDoc(doc(db, 'users', firebaseUser.uid), { name: firebaseUser.displayName }, { merge: true })
           }
           setProfile({ id: snap.id, ...data, name })
@@ -33,6 +31,31 @@ export function AuthProvider({ children }) {
           setProfile({ id: firebaseUser.uid, role: 'staff', name: firebaseUser.displayName || firebaseUser.email })
         }
       } else {
-git add -A
-git commit -m "Fix display name from Google profile"
-git push
+        setUser(null)
+        setProfile(null)
+      }
+      setLoading(false)
+    })
+    return unsubscribe
+  }, [])
+
+  const login = (email, password) => signInWithEmailAndPassword(auth, email, password)
+  const logout = () => signOut(auth)
+  const resetPassword = (email) => sendPasswordResetEmail(auth, email)
+
+  const isAdmin = profile?.role === 'admin'
+  const isStaff = profile?.role === 'staff' || profile?.role === 'admin'
+  const isClient = profile?.role === 'client'
+
+  return (
+    <AuthContext.Provider value={{ user, profile, loading, login, logout, resetPassword, isAdmin, isStaff, isClient }}>
+      {children}
+    </AuthContext.Provider>
+  )
+}
+
+export function useAuth() {
+  const ctx = useContext(AuthContext)
+  if (!ctx) throw new Error('useAuth must be used within AuthProvider')
+  return ctx
+}
