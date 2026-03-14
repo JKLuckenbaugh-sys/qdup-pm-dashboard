@@ -176,7 +176,7 @@ function ClientNavItem({ client, expanded, onToggle, onClose, location }) {
   return (
     <div>
       <button onClick={onToggle} className={`nav-item w-full text-left ${isClientActive ? 'text-white' : ''}`}>
-        <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: client.color || '#E87722' }} />
+        {client.logoUrl ? <img src={client.logoUrl} alt={client.name} className="w-5 h-5 rounded object-contain flex-shrink-0" /> : <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: client.color || '#E87722' }} />}
         <span className="flex-1 truncate">{client.name}</span>
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`flex-shrink-0 transition-transform ${expanded ? 'rotate-90' : ''}`}>
           <polyline points="9 18 15 12 9 6"/>
