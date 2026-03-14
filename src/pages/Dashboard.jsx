@@ -103,10 +103,10 @@ function ClientCard({ client }) {
       <div className="flex items-start gap-3 mb-4">
         {/* Client avatar */}
         <div
-          className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold text-black flex-shrink-0"
+          className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold text-black flex-shrink-0 overflow-hidden"
           style={{ backgroundColor: client.color || '#E87722' }}
         >
-          {getInitials(client.name)}
+          {client.logoUrl ? <img src={client.logoUrl} alt={client.name} className="w-full h-full object-contain p-1" /> : getInitials(client.name)}
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-display font-bold text-white text-base group-hover:text-[#E87722] transition-colors truncate">{client.name}</h3>

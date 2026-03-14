@@ -272,7 +272,7 @@ function AddUserModal({ open, onClose, clients }) {
 }
 
 function AddClientModal({ open, onClose, clientCount }) {
-  const [form, setForm] = useState({ name: '', description: '' })
+  const [form, setForm] = useState({ name: '', description: '', logoUrl: '' })
   const [saving, setSaving] = useState(false)
   const COLORS = ['#E87722','#4D7FA3','#2D5F7E','#C9621A','#6495B8','#22c55e','#F08D40']
 
@@ -282,6 +282,7 @@ function AddClientModal({ open, onClose, clientCount }) {
     try {
       await addDoc(collection(db, 'clients'), {
         name: form.name.trim(),
+        logoUrl: form.logoUrl.trim(),
         description: form.description.trim(),
         color: COLORS[clientCount % COLORS.length],
         createdAt: serverTimestamp(),
@@ -299,6 +300,10 @@ function AddClientModal({ open, onClose, clientCount }) {
         <div>
           <label className="label block mb-1.5">Client / Company Name</label>
           <input autoFocus value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} className="input-field" placeholder="Acme Corp" required />
+        </div>
+        <div>
+          <label className="label block mb-1.5">Logo URL (optional)</label>
+          <input value={form.logoUrl} onChange={e => setForm(f => ({...f, logoUrl: e.target.value}))} className="input-field" placeholder="https://example.com/logo.png" />
         </div>
         <div>
           <label className="label block mb-1.5">Description (optional)</label>
