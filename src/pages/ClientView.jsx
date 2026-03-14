@@ -67,9 +67,9 @@ export default function ClientView() {
           <div className="flex items-center gap-4 mb-8">
             <div
               className="w-14 h-14 rounded-2xl flex items-center justify-center text-lg font-bold text-black flex-shrink-0"
-              style={{ backgroundColor: client.color || '#E87722' }}
+              style={{ backgroundColor: client.logoUrl ? 'transparent' : (client.color || '#E87722') }}
             >
-              {getInitials(client.name)}
+              {client.logoUrl ? <img src={client.logoUrl} alt={client.name} className="w-full h-full object-contain p-2" /> : getInitials(client.name)}
             </div>
             <div>
               <h1 className="font-display text-2xl font-bold text-white">{client.name}</h1>
