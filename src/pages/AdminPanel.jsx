@@ -174,26 +174,61 @@ function UserRow({ user, clients }) {
 }
 
 function ClientRow({ client }) {
+  const [editing, setEditing] = useState(false)
+  const [form, setForm] = useState({ name: client.name, description: client.description || '', logoUrl: client.logoUrl || '' })
+  const [saving, setSaving] = useState(false)
+
   async function deleteClient() {
     if (!confirm(`Delete client "${client.name}"? This won't delete projects inside.`)) return
     await deleteDoc(doc(db, 'clients', client.id))
   }
 
+  async function saveClient() {
+    setSaving(true)
+    await updateDoc(doc(db, 'clients', client.id), {
+      name: form.name.trim(),
+      description: form.description.trim(),
+      logoUrl: form.logoUrl.trim(),
+    })
+    setSaving(false)
+    setEditing(false)
+  }
+
   return (
-    <div className="card p-4 flex items-center gap-3">
-      <div
-        className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-black flex-shrink-0"
-        style={{ backgroundColor: client.color || '#E87722' }}
-      >
-        {getInitials(client.name)}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-white truncate">{client.name}</p>
-        {client.description && <p className="text-xs text-gray-500 truncate">{client.description}</p>}
-      </div>
-      <button onClick={deleteClient} className="text-gray-600 hover:text-red-400 text-xs transition-colors">
-        Delete
-      </button>
+    <div className="card p-4">
+      {editing ? (
+        <div className="space-y-3">
+          <div>
+            <label className="label block mb-1">Client Name</label>
+            <input value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} className="input-field" />
+          </div>
+          <div>
+            <label className="label block mb-1">Logo URL</label>
+            <input value={form.logoUrl} onChange={e => setForm(f => ({...f, logoUrl: e.target.value}))} className="input-field" placeholder="https://example.com/logo.png" />
+            {form.logoUrl && <img src={form.logoUrl} alt="preview" className="mt-2 h-10 object-contain rounded" />}
+          </div>
+          <div>
+            <label className="label block mb-1">Description</label>
+            <input value={form.description} onChange={e => setForm(f => ({...f, description: e.target.value}))} className="input-field" placeholder="Optional note" />
+          </div>
+          <div className="flex gap-2">
+            <button onClick={saveClient} disabled={saving} className="btn-primary text-xs">{saving ? 'Saving...' : 'Save'}</button>
+            <button onClick={() => setEditing(false)} className="btn-ghost text-xs">Cancel</button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-black flex-shrink-0 overflow-hidden" style={{ backgroundColor: client.logoUrl ? 'transparent' : (client.color || '#E87722') }}>
+            {client.logoUrl ? <img src={client.logoUrl} alt={client.name} className="w-full h-full object-contain p-0.5" /> : getInitials(client.name)}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-white truncate">{client.name}</p>
+            {client.description && <p className="text-xs text-gray-500 truncate">{client.description}</p>}
+          </div>
+          <button onClick={() => setEditing(true)} className="text-gray-600 hover:text-[#E87722] text-xs transition-colors">Edit</button>
+          <button onClick={deleteClient} className="text-gray-600 hover:text-red-400 text-xs transition-colors">Delete</button>
+        </div>
+      )}
     </div>
   )
 }
