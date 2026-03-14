@@ -73,6 +73,8 @@ export default function ProjectView() {
         onMenuToggle={onMenuToggle}
         title={project?.name || 'Loading...'}
         subtitle={client?.name}
+        logo={client?.logoUrl}
+        logoAlt={client?.name}
       />
 
       <div className="px-4 lg:px-8 py-6 max-w-6xl mx-auto">
