@@ -7,7 +7,7 @@ import ItemRow from './ItemRow'
 export default function GroupSection({ group, clientId, projectId }) {
   const { isStaff } = useAuth()
   const [items, setItems] = useState([])
-  const [expanded, setExpanded] = useState(true)
+  const [expanded, setExpanded] = useState(false)
   const [adding, setAdding] = useState(false)
   const [newTitle, setNewTitle] = useState('')
   const [saving, setSaving] = useState(false)
