@@ -18,6 +18,9 @@ export default function Sidebar({ open, onClose }) {
   const [clients, setClients] = useState([])
   const [expandedClients, setExpandedClients] = useState({})
 
+  const internalClients = clients.filter(c => c.isInternal)
+  const externalClients = clients.filter(c => !c.isInternal)
+
   useEffect(() => {
     if (!profile) return
     const q = query(collection(db, 'clients'), orderBy('name'))
@@ -52,6 +55,25 @@ export default function Sidebar({ open, onClose }) {
           Dashboard
         </Link>
 
+        {/* Q'd Up internal section */}
+        {!isClient && internalClients.length > 0 && (
+          <div className="pt-4">
+            <div className="flex items-center justify-between px-3 mb-2">
+              <span className="label text-[10px]" style={{ color: '#E87722' }}>Q'D UP</span>
+            </div>
+            {internalClients.map(client => (
+              <ClientNavItem
+                key={client.id}
+                client={client}
+                expanded={expandedClients[client.id]}
+                onToggle={() => toggleClient(client.id)}
+                onClose={onClose}
+                location={location}
+              />
+            ))}
+          </div>
+        )}
+
         {/* Clients section */}
         {!isClient && (
           <div className="pt-4">
@@ -65,7 +87,7 @@ export default function Sidebar({ open, onClose }) {
                 </Link>
               )}
             </div>
-            {clients.map(client => (
+            {externalClients.map(client => (
               <ClientNavItem
                 key={client.id}
                 client={client}
@@ -75,7 +97,7 @@ export default function Sidebar({ open, onClose }) {
                 location={location}
               />
             ))}
-            {clients.length === 0 && (
+            {externalClients.length === 0 && (
               <p className="text-gray-600 text-xs px-3 py-2">No clients yet</p>
             )}
           </div>
