@@ -3,6 +3,7 @@ import { collection, onSnapshot, query, orderBy, addDoc, serverTimestamp, delete
 import { db } from '../../firebase'
 import { useAuth } from '../../context/AuthContext'
 import ItemRow from './ItemRow'
+import DAMPanel from './DAMPanel'
 
 export default function GroupSection({ group, clientId, projectId }) {
   const { isStaff } = useAuth()
@@ -11,6 +12,7 @@ export default function GroupSection({ group, clientId, projectId }) {
   const [adding, setAdding] = useState(false)
   const [newTitle, setNewTitle] = useState('')
   const [saving, setSaving] = useState(false)
+  const [damOpen, setDamOpen] = useState(false)
 
   const groupPath = `clients/${clientId}/projects/${projectId}/groups/${group.id}`
 
@@ -49,6 +51,7 @@ export default function GroupSection({ group, clientId, projectId }) {
   const progress = items.length > 0 ? Math.round((doneCount / items.length) * 100) : 0
 
   return (
+    <>
     <div className="mb-4 rounded-xl overflow-hidden border border-[#1e2d3a] bg-[#0f1519]">
       {/* Group header */}
       <div
@@ -88,6 +91,15 @@ export default function GroupSection({ group, clientId, projectId }) {
         {/* Group actions */}
         {isStaff && (
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={e => e.stopPropagation()}>
+            <button
+              onClick={() => setDamOpen(true)}
+              className="text-gray-500 hover:text-[#4D7FA3] p-1 rounded transition-colors"
+              title="Files"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+              </svg>
+            </button>
             <button
               onClick={() => { setAdding(true); setExpanded(true) }}
               className="text-gray-500 hover:text-[#E87722] p-1 rounded transition-colors"
@@ -177,5 +189,7 @@ export default function GroupSection({ group, clientId, projectId }) {
         </div>
       )}
     </div>
+      {damOpen && <DAMPanel open={damOpen} onClose={() => setDamOpen(false)} group={group} clientId={clientId} projectId={projectId} />}
+    </>
   )
 }
