@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { doc, updateDoc, deleteDoc, collection, onSnapshot, query, orderBy, serverTimestamp } from 'firebase/firestore'
+import { doc, updateDoc, deleteDoc, collection, onSnapshot, query, orderBy, serverTimestamp, addDoc } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { useAuth } from '../../context/AuthContext'
 import SubItemRow from './SubItemRow'
@@ -13,6 +13,8 @@ export default function ItemRow({ item, clientId, projectId, groupId }) {
   const [expanded, setExpanded] = useState(false)
   const [subitems, setSubitems] = useState([])
   const [showDetail, setShowDetail] = useState(false)
+  const [addingSubitem, setAddingSubitem] = useState(false)
+  const [newSubitemTitle, setNewSubitemTitle] = useState('')
 
   const itemPath = `clients/${clientId}/projects/${projectId}/groups/${groupId}/items/${item.id}`
 
@@ -23,6 +25,17 @@ export default function ItemRow({ item, clientId, projectId, groupId }) {
       setSubitems(snap.docs.map(d => ({ id: d.id, ...d.data() })))
     })
   }, [expanded, itemPath])
+
+  async function addSubitem() {
+    if (!newSubitemTitle.trim()) return
+    await addDoc(collection(db, itemPath, 'subitems'), {
+      title: newSubitemTitle.trim(),
+      status: 'not_started',
+      createdAt: serverTimestamp(),
+    })
+    setNewSubitemTitle('')
+    setAddingSubitem(false)
+  }
 
   async function updateStatus(status) {
     await updateDoc(doc(db, itemPath), { status, updatedAt: serverTimestamp() })
@@ -131,10 +144,30 @@ export default function ItemRow({ item, clientId, projectId, groupId }) {
             {subitems.map(sub => (
               <SubItemRow key={sub.id} subitem={sub} itemPath={itemPath} />
             ))}
-            {subitems.length === 0 && (
-              <p className="text-gray-600 text-xs px-12 py-3">
-                No sub-tasks — open item to add some
-              </p>
+            {subitems.length === 0 && !addingSubitem && (
+              <p className="text-gray-600 text-xs px-12 py-3">No sub-tasks yet</p>
+            )}
+            {isStaff && !addingSubitem && (
+              <button
+                onClick={() => setAddingSubitem(true)}
+                className="w-full text-left px-12 py-2 text-gray-600 hover:text-gray-400 text-xs transition-colors hover:bg-white/[0.02]"
+              >
+                + Add sub-task
+              </button>
+            )}
+            {addingSubitem && (
+              <div className="flex gap-2 px-12 py-2 bg-[#0a1018]">
+                <input
+                  autoFocus
+                  value={newSubitemTitle}
+                  onChange={e => setNewSubitemTitle(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') addSubitem(); if (e.key === 'Escape') { setAddingSubitem(false); setNewSubitemTitle('') } }}
+                  className="input-field flex-1 text-xs"
+                  placeholder="Sub-task title... (Enter to save)"
+                />
+                <button onClick={addSubitem} className="btn-primary text-xs">Add</button>
+                <button onClick={() => { setAddingSubitem(false); setNewSubitemTitle('') }} className="btn-ghost text-xs">Cancel</button>
+              </div>
             )}
           </div>
         )}
