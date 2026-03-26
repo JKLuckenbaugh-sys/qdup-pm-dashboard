@@ -11,9 +11,11 @@ export default function TopBar({ onMenuToggle, title, subtitle, logo, logoAlt })
           <line x1="3" y1="18" x2="21" y2="18"/>
         </svg>
       </button>
-      <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0">
-        <img src={logo || "/favicon.svg"} alt={logoAlt || title || "Q'd Up"} className="w-full h-full object-contain" />
-      </div>
+      {logo && (
+        <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0">
+          <img src={logo} alt={logoAlt || title} className="w-full h-full object-contain" />
+        </div>
+      )}
       <div className="flex-1 min-w-0">
         {title && (
           <h1 className="font-display font-bold text-white text-lg leading-tight truncate">{title}</h1>
