@@ -7,7 +7,7 @@ import { getInitials, getAvatarColor } from '../../utils/constants'
 
 const Logo = () => (
   <div className="px-4 py-4 border-b border-[#1e2d3a]">
-    <img src="/qdup-logo.png" alt="Q'd Up" className="h-8 object-contain object-left" />
+    <img src="/favicon.svg" alt="Q'd Up" className="h-8 object-contain object-left" />
   </div>
 )
 
