@@ -1,7 +1,6 @@
 export default function TopBar({ onMenuToggle, title, subtitle, logo, logoAlt }) {
   return (
     <header className="sticky top-0 z-30 bg-[#0a0e12]/80 backdrop-blur-md border-b border-[#1e2d3a] px-4 lg:px-6 py-3 flex items-center gap-4">
-      {/* Mobile menu toggle */}
       <button
         onClick={onMenuToggle}
         className="lg:hidden text-gray-400 hover:text-white transition-colors p-1"
@@ -12,12 +11,9 @@ export default function TopBar({ onMenuToggle, title, subtitle, logo, logoAlt })
           <line x1="3" y1="18" x2="21" y2="18"/>
         </svg>
       </button>
-
-      {logo && (
-        <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0">
-          <img src={logo} alt={logoAlt || title} className="w-full h-full object-contain" />
-        </div>
-      )}
+      <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0">
+        <img src={logo || "/favicon.svg"} alt={logoAlt || title || "Q'd Up"} className="w-full h-full object-contain" />
+      </div>
       <div className="flex-1 min-w-0">
         {title && (
           <h1 className="font-display font-bold text-white text-lg leading-tight truncate">{title}</h1>
