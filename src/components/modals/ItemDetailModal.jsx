@@ -48,19 +48,20 @@ export default function ItemDetailModal({ item, clientId, projectId, groupId, on
   async function handleSave() {
     setSaving(true)
     try {
-      await updateDoc(doc(db, itemPath), {
+      const updates = {
         title: form.title,
         status: form.status,
-        contentType: form.contentType,
-        assignee: form.assignee,
-        dueDate: form.dueDate,
-        publishDate: form.publishDate,
-        approvalStatus: form.approvalStatus,
-        priority: form.priority,
-        notes: form.notes,
-        fileLinks: form.fileLinks,
+        contentType: form.contentType || null,
+        assignee: form.assignee || null,
+        dueDate: form.dueDate || null,
+        publishDate: form.publishDate || null,
+        approvalStatus: form.approvalStatus || null,
+        priority: form.priority || null,
+        notes: form.notes || null,
+        fileLinks: form.fileLinks || null,
         updatedAt: serverTimestamp(),
-      })
+      }
+      await updateDoc(doc(db, itemPath), updates)
       setEditing(false)
     } catch (e) {
       console.error(e)
