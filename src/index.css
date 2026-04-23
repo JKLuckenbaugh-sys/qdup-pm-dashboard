@@ -52,3 +52,26 @@
 .priority-medium { color: #E87722; }
 .priority-low { color: #6b7280; }
 .brand-gradient { background: linear-gradient(90deg, #4D7FA3 0%, #E87722 100%); }
+
+/* Doc Editor */
+.doc-editor .ProseMirror {
+  outline: none;
+  min-height: 500px;
+  color: #e5e7eb;
+  font-size: 15px;
+  line-height: 1.8;
+}
+.doc-editor .ProseMirror h1 { font-size: 2em; font-weight: 700; color: white; margin: 1em 0 0.5em; }
+.doc-editor .ProseMirror h2 { font-size: 1.5em; font-weight: 600; color: white; margin: 1em 0 0.5em; }
+.doc-editor .ProseMirror h3 { font-size: 1.2em; font-weight: 600; color: white; margin: 1em 0 0.5em; }
+.doc-editor .ProseMirror p { margin-bottom: 0.75em; }
+.doc-editor .ProseMirror ul, .doc-editor .ProseMirror ol { padding-left: 1.5em; margin-bottom: 0.75em; }
+.doc-editor .ProseMirror li { margin-bottom: 0.25em; }
+.doc-editor .ProseMirror blockquote { border-left: 3px solid #E87722; padding-left: 1em; color: #9ca3af; margin: 1em 0; }
+.doc-editor .ProseMirror code { background: #1e2d3a; padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; }
+.doc-editor .ProseMirror pre { background: #1e2d3a; padding: 1em; border-radius: 8px; margin: 1em 0; overflow-x: auto; }
+.doc-editor .ProseMirror a { color: #4D7FA3; text-decoration: underline; }
+.doc-editor .ProseMirror table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+.doc-editor .ProseMirror td, .doc-editor .ProseMirror th { border: 1px solid #1e2d3a; padding: 8px 12px; }
+.doc-editor .ProseMirror th { background: #0f1519; font-weight: 600; color: white; }
+.doc-editor .ProseMirror .is-editor-empty:first-child::before { content: attr(data-placeholder); color: #4b5563; pointer-events: none; float: left; height: 0; }
