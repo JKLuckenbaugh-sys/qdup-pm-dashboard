@@ -10,6 +10,9 @@ import Placeholder from '@tiptap/extension-placeholder'
 import TextAlign from '@tiptap/extension-text-align'
 import Underline from '@tiptap/extension-underline'
 import { doc, onSnapshot, setDoc, serverTimestamp } from 'firebase/firestore'
+import { saveAs } from 'file-saver'
+import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx'
+import jsPDF from 'jspdf'
 import { db } from '../../firebase'
 
 export default function DocEditor({ docId, clientId, projectId, groupId, title, onClose }) {
@@ -67,6 +70,52 @@ export default function DocEditor({ docId, clientId, projectId, groupId, title, 
     editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()
   }
 
+  async function exportDocx() {
+    const text = editor.getText()
+    const html = editor.getHTML()
+    const parser = new DOMParser()
+    const parsed = parser.parseFromString(html, 'text/html')
+    const children = []
+    parsed.body.childNodes.forEach(node => {
+      if (node.nodeName === 'H1') {
+        children.push(new Paragraph({ text: node.textContent, heading: HeadingLevel.HEADING_1 }))
+      } else if (node.nodeName === 'H2') {
+        children.push(new Paragraph({ text: node.textContent, heading: HeadingLevel.HEADING_2 }))
+      } else if (node.nodeName === 'H3') {
+        children.push(new Paragraph({ text: node.textContent, heading: HeadingLevel.HEADING_3 }))
+      } else if (node.nodeName === 'UL' || node.nodeName === 'OL') {
+        node.querySelectorAll('li').forEach(li => {
+          children.push(new Paragraph({ text: '• ' + li.textContent }))
+        })
+      } else {
+        const text = node.textContent?.trim()
+        if (text) children.push(new Paragraph({ text }))
+      }
+    })
+    const doc_ = new Document({ sections: [{ properties: {}, children }] })
+    const blob = await Packer.toBlob(doc_)
+    saveAs(blob, `${title}.docx`)
+  }
+
+  async function exportPdf() {
+    const pdf = new jsPDF({ unit: 'mm', format: 'a4' })
+    const text = editor.getText()
+    const lines = pdf.splitTextToSize(text, 170)
+    let y = 20
+    pdf.setFontSize(16)
+    pdf.setFont('helvetica', 'bold')
+    pdf.text(title, 20, y)
+    y += 10
+    pdf.setFontSize(11)
+    pdf.setFont('helvetica', 'normal')
+    lines.forEach(line => {
+      if (y > 270) { pdf.addPage(); y = 20 }
+      pdf.text(line, 20, y)
+      y += 6
+    })
+    pdf.save(`${title}.pdf`)
+  }
+
   if (!editor) return null
 
   return (
@@ -116,6 +165,20 @@ export default function DocEditor({ docId, clientId, projectId, groupId, title, 
           title="Copy as plain text"
         >
           Copy text
+        </button>
+        <button
+          onClick={exportDocx}
+          className="text-xs text-gray-500 hover:text-white px-2 py-1 rounded transition-colors border border-[#1e2d3a] hover:border-[#4D7FA3]"
+          title="Export as Word document"
+        >
+          ↓ .docx
+        </button>
+        <button
+          onClick={exportPdf}
+          className="text-xs text-gray-500 hover:text-white px-2 py-1 rounded transition-colors border border-[#1e2d3a] hover:border-[#E87722]"
+          title="Export as PDF"
+        >
+          ↓ .pdf
         </button>
       </div>
 
